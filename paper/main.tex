@@ -1,6 +1,6 @@
-\documentclass[11pt]{article}
+\documentclass[10pt,twocolumn]{article}
 
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.75in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{hyperref}
@@ -73,9 +73,9 @@ HotpotQA is especially appropriate for this pilot because many questions require
 
 We evaluate the following completed conditions:
 
-\begin{table}[h]
+\begin{table*}[t]
 \centering
-\begin{tabular}{p{0.26\linewidth}p{0.62\linewidth}}
+\begin{tabular}{p{0.24\textwidth}p{0.66\textwidth}}
 \toprule
 \textbf{Condition} & \textbf{Description} \\
 \midrule
@@ -86,7 +86,7 @@ Saved vector top-8 cross-model comparison & Multiple models receive the same sav
 \end{tabular}
 \caption{Completed experimental conditions.}
 \label{tab:conditions}
-\end{table}
+\end{table*}
 
 All answer-generation experiments used a strict citation prompt. The prompt instructed the model to use only the provided context, cite source sentence IDs, avoid outside knowledge, and state that the document does not provide enough information when the context is insufficient.
 
@@ -145,8 +145,9 @@ For each question, we compare retrieved sentence IDs against expected supporting
 
 Table~\ref{tab:gold-vector} compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
+\small
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Setting} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
@@ -165,8 +166,9 @@ The gold-evidence condition produced substantially higher answer and citation ac
 
 Table~\ref{tab:retrieval-quality} shows retrieval completeness for vector retrieval.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
+\small
 \begin{tabular}{rrrr}
 \toprule
 \textbf{k} & \textbf{Any Gold Retrieved} & \textbf{All Gold Retrieved} & \textbf{Mean Citation Recall} \\
@@ -187,8 +189,9 @@ The top-8 retriever found at least one gold supporting sentence for every questi
 
 Table~\ref{tab:cross-model} compares models under the same vector top-8 context and strict citation prompt.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
+\small
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Model} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
@@ -207,8 +210,9 @@ The cross-model results show that a stronger or different model family did not a
 
 To compare all models on the same question subset, Table~\ref{tab:first20} reports a first-20 comparison.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
+\small
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Model} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
