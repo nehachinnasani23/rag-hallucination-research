@@ -7,6 +7,11 @@
 \usepackage{natbib}
 \usepackage{enumitem}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
 
 \hypersetup{
     colorlinks=true,
@@ -68,6 +73,35 @@ The source documents are converted into sentence-level records with IDs such as 
 HotpotQA is especially appropriate for this pilot because many questions require multi-hop reasoning. A model may need one sentence to identify an entity and another sentence to answer the final question. This allows the experiment to test whether retrieval returns the full evidence chain, not merely a related passage.
 
 \section{Methodology}
+
+Figure~\ref{fig:pipeline} summarizes the evaluation pipeline. The dataset provides questions, answers, and supporting facts. The system retrieves evidence using either gold supporting facts or vector retrieval, sends the resulting context to a model with a strict citation prompt, and then evaluates the output using human labels.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    box/.style={draw, rounded corners, align=center, minimum height=0.95cm, minimum width=2.45cm, fill=blue!6},
+    goldbox/.style={draw, rounded corners, align=center, minimum height=0.95cm, minimum width=2.45cm, fill=yellow!15},
+    metricbox/.style={draw, rounded corners, align=center, minimum height=0.95cm, minimum width=2.45cm, fill=green!8},
+    arrow/.style={-{Latex[length=2mm]}, thick}
+]
+\node[box] (data) {HotpotQA\\questions};
+\node[goldbox, right=of data] (retrieve) {Gold or vector\\evidence retrieval};
+\node[box, right=of retrieve] (prompt) {Strict citation\\RAG prompt};
+\node[box, right=of prompt] (model) {LLM\\answer};
+\node[metricbox, right=of model] (metrics) {Human labels\\and metrics};
+
+\draw[arrow] (data) -- (retrieve);
+\draw[arrow] (retrieve) -- (prompt);
+\draw[arrow] (prompt) -- (model);
+\draw[arrow] (model) -- (metrics);
+
+\node[align=center, below=0.55cm of retrieve, text width=3.1cm] {\small sentence IDs\\such as \texttt{S000001}};
+\node[align=center, below=0.55cm of metrics, text width=3.2cm] {\small answer accuracy\\citation accuracy\\hallucination};
+\end{tikzpicture}
+\caption{RAG evaluation workflow used in the pilot study.}
+\label{fig:pipeline}
+\end{figure*}
 
 \subsection{RAG Conditions}
 
@@ -145,7 +179,7 @@ For each question, we compare retrieved sentence IDs against expected supporting
 
 Table~\ref{tab:gold-vector} compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \small
 \begin{tabular}{lrrrr}
@@ -158,15 +192,48 @@ Vector top-8 & 50 & 60.0\% & 67.5\% & 6.0\% \\
 \end{tabular}
 \caption{Gold evidence compared with vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
 \label{tab:gold-vector}
-\end{table}
+\end{table*}
 
-The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark.
+The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark. Figure~\ref{fig:gold-vector-bars} visualizes the same performance gap.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[x=0.105cm,y=0.7cm]
+    \draw[->] (0,-0.8) -- (105,-0.8) node[right] {\small Percent};
+    \foreach \x in {0,25,50,75,100} {
+        \draw (\x,-0.9) -- (\x,-0.7);
+        \node[below] at (\x,-0.9) {\scriptsize \x};
+    }
+
+    \node[left, align=right] at (0,3) {\small Gold answer};
+    \fill[blue!65] (0,2.75) rectangle (88,3.25);
+    \node[right] at (88,3) {\small 88.0\%};
+
+    \node[left, align=right] at (0,2) {\small Vector answer};
+    \fill[blue!35] (0,1.75) rectangle (60,2.25);
+    \node[right] at (60,2) {\small 60.0\%};
+
+    \node[left, align=right] at (0,1) {\small Gold citation};
+    \fill[green!60!black] (0,0.75) rectangle (87.5,1.25);
+    \node[right] at (87.5,1) {\small 87.5\%};
+
+    \node[left, align=right] at (0,0) {\small Vector citation};
+    \fill[green!40] (0,-0.25) rectangle (67.5,0.25);
+    \node[right] at (67.5,0) {\small 67.5\%};
+
+    \node[left, align=right] at (0,-1.9) {\small Vector hallucination};
+    \fill[red!55] (0,-2.15) rectangle (6,-1.65);
+    \node[right] at (6,-1.9) {\small 6.0\%};
+\end{tikzpicture}
+\caption{Gold evidence produces higher answer and citation accuracy than vector-retrieved evidence in the pilot comparison.}
+\label{fig:gold-vector-bars}
+\end{figure*}
 
 \subsection{Retrieval Quality}
 
 Table~\ref{tab:retrieval-quality} shows retrieval completeness for vector retrieval.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \small
 \begin{tabular}{rrrr}
@@ -181,15 +248,40 @@ Table~\ref{tab:retrieval-quality} shows retrieval completeness for vector retrie
 \end{tabular}
 \caption{Retrieval completeness for saved vector retrieval.}
 \label{tab:retrieval-quality}
-\end{table}
+\end{table*}
 
-The top-8 retriever found at least one gold supporting sentence for every question, but retrieved all gold supporting sentences for only 52.0\% of questions. This explains why vector retrieval can look strong under an ``any relevant evidence'' metric while still failing many multi-hop questions. For multi-hop RAG, partial evidence is often not enough.
+The top-8 retriever found at least one gold supporting sentence for every question, but retrieved all gold supporting sentences for only 52.0\% of questions. Figure~\ref{fig:evidence-gap} illustrates this gap. Vector retrieval can look strong under an ``any relevant evidence'' metric while still failing many multi-hop questions. For multi-hop RAG, partial evidence is often not enough.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+    evidence/.style={draw, rounded corners, minimum width=2.2cm, minimum height=0.9cm, align=center},
+    present/.style={evidence, fill=green!12},
+    missing/.style={evidence, dashed, fill=red!8},
+    arrow/.style={-{Latex[length=2mm]}, thick}
+]
+\node[present] (s1) {Evidence 1\\retrieved};
+\node[missing, right=0.9cm of s1] (s2) {Evidence 2\\missing};
+\node[present, right=0.9cm of s2] (s3) {Evidence 3\\retrieved};
+\node[draw, rounded corners, fill=blue!7, align=center, minimum width=3.0cm, minimum height=1.1cm, right=1.1cm of s3] (answer) {Answer may be\\partial or weakly cited};
+
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (answer);
+
+\node[below=0.6cm of s1, align=center] {\small Any gold\\retrieved: 100.0\%};
+\node[below=0.6cm of s2, align=center, text=red!70!black] {\small Missing link\\breaks grounding};
+\node[below=0.6cm of s3, align=center] {\small All gold\\retrieved: 52.0\%};
+\end{tikzpicture}
+\caption{Partial evidence retrieval can leave a missing link in the multi-hop evidence chain.}
+\label{fig:evidence-gap}
+\end{figure*}
 
 \subsection{Cross-Model Comparison}
 
 Table~\ref{tab:cross-model} compares models under the same vector top-8 context and strict citation prompt.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \small
 \begin{tabular}{lrrrr}
@@ -204,13 +296,13 @@ Gemini & 23 & 47.8\% & 20.0\% & 4.3\% \\
 \end{tabular}
 \caption{Cross-model comparison using saved vector top-8 context and strict citation prompting.}
 \label{tab:cross-model}
-\end{table}
+\end{table*}
 
 The cross-model results show that a stronger or different model family did not automatically solve the retrieval-grounding problem. \texttt{gpt-4.1-mini} achieved the highest answer accuracy in the full available comparison, while \texttt{gpt-4.1} and Claude had lower hallucination rates. Gemini was evaluated on only 23 generated rows due to generation limits, so its full-run result should be interpreted cautiously.
 
 To compare all models on the same question subset, Table~\ref{tab:first20} reports a first-20 comparison.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \small
 \begin{tabular}{lrrrr}
@@ -225,7 +317,7 @@ Gemini & 20 & 50.0\% & 23.1\% & 5.0\% \\
 \end{tabular}
 \caption{Fair first-20 cross-model comparison.}
 \label{tab:first20}
-\end{table}
+\end{table*}
 
 The first-20 comparison suggests that model choice affects citation behavior and hallucination rate, but retrieval completeness remains a central bottleneck.
 
