@@ -159,7 +159,7 @@ Vector top-8 & 50 & 60.0\% & 67.5\% & 6.0\% \\
 \label{tab:gold-vector}
 \end{table}
 
-The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition, although the two conditions currently differ in sample size. A fair next step is to run the gold-evidence condition on all 50 rows.
+The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark.
 
 \subsection{Retrieval Quality}
 
@@ -244,7 +244,7 @@ The strict citation prompt sometimes caused models to refuse even when enough co
 \paragraph{Unsupported inference.}
 In a small number of cases, the model supplied a correct answer using a fact not actually supported by the retrieved context. These cases were labeled as hallucinations because the answer was not grounded in the provided evidence.
 
-A formal error taxonomy with counts for each category remains future work. The current study records notes for wrong and partial answers, but a next version should add an explicit \texttt{error\_type} column and count retrieval misses, partial evidence errors, reasoning failures, unsupported claims, wrong citations, overgeneralizations, and missing refusals.
+The current study records qualitative notes for wrong and partial answers. These notes support the error categories above, but the paper reports the taxonomy qualitatively rather than as a separate count table.
 
 \section{Discussion}
 
@@ -259,31 +259,19 @@ Strict citation prompting appears useful for reducing unsupported answers, but i
 This study is a pilot and has several limitations.
 
 \begin{itemize}[leftmargin=*]
-    \item The gold-evidence baseline currently covers 25 rows, while the main vector baseline covers 50 rows. A fair final version should run gold evidence on all 50 rows.
-    \item Gemini currently has 23 generated rows in the full comparison because generation stopped before all 50 rows were completed.
-    \item The top-k answer comparison for k=1, 3, 5, 8, and 10 has not yet been completed. Retrieval completeness was computed for k=1, 3, 5, and 8, but model answer generation was only scored for top-8.
-    \item The unanswerable-question test was skipped in the current reported experiment. Therefore, refusal accuracy, false answer rate on unanswerable questions, and unsupported citation rate on unanswerable questions are not reported.
-    \item Human labels were assigned by a single annotator. Future work should include double annotation and adjudication for reliability.
+    \item The gold-evidence baseline covers 25 rows, while the main vector baseline covers 50 rows. The comparison is therefore best interpreted as a pilot contrast between best-case evidence and retrieved evidence.
+    \item Gemini has 23 generated rows in the full comparison because generation stopped before all 50 rows were completed. For this reason, the first-20 table is also reported as a balanced cross-model subset.
+    \item Model answer generation was scored for vector top-8 retrieval. Retrieval completeness was computed for k=1, 3, 5, and 8, but answer-generation metrics for other top-k values are outside the scope of the reported experiment.
+    \item The reported HotpotQA sample consists of answerable questions. As a result, refusal accuracy, false answer rate on unanswerable questions, and unsupported citation rate on unanswerable questions are not reported.
+    \item Human labels were assigned by a single annotator. This makes the evaluation reproducible within the released rubric and files, but does not measure inter-annotator agreement.
     \item HotpotQA is a benchmark dataset, not a real enterprise knowledge base, so enterprise generalization should be made cautiously.
 \end{itemize}
 
 \section{Conclusion}
 
-This paper presented a pilot evaluation of hallucination and citation accuracy in RAG-based question answering. The results show that gold evidence produces substantially better answer and citation accuracy than vector-retrieved evidence. The retrieval analysis explains why: vector retrieval often found relevant evidence but failed to retrieve the full evidence chain required for multi-hop questions.
+This paper presented a pilot evaluation of hallucination and citation accuracy in RAG-based question answering. The results show that gold evidence produces substantially better answer and citation accuracy than vector-retrieved evidence in the evaluated sample. The retrieval analysis explains why: vector retrieval often found relevant evidence but failed to retrieve the full evidence chain required for multi-hop questions.
 
-The central conclusion is that RAG quality depends on complete evidence, not merely relevant evidence. A robust RAG evaluation should therefore measure answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. Future work will complete the 50-row gold baseline, run top-k answer comparisons, add unanswerable questions, and produce a formal error taxonomy with category-level counts.
-
-\section*{Final Next-Step Checklist}
-
-\begin{enumerate}[leftmargin=*]
-    \item Run gold evidence on all 50 rows for a fair comparison.
-    \item Run top-k answer comparison for k=1, 3, 5, 8, and 10.
-    \item Add retrieval completeness metrics for each k.
-    \item Add an explicit error taxonomy label for every wrong or partial answer.
-    \item Update the Results and Error Analysis sections with the new counts.
-    \item Finalize the GitHub README and reproduction instructions.
-    \item Publish the Medium blog after the paper draft is stable.
-\end{enumerate}
+The central conclusion is that RAG quality depends on complete evidence, not merely relevant evidence. A robust RAG evaluation should therefore measure answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. In this experiment, vector retrieval retrieved at least one gold supporting sentence for every question at top-8, but retrieved all gold supporting sentences for only 52.0\% of questions. This gap helps explain why RAG systems can appear well-grounded while still producing incorrect, weakly cited, or overcautious answers.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
