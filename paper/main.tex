@@ -3,6 +3,7 @@
 \usepackage[margin=0.75in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{natbib}
 \usepackage{enumitem}
@@ -461,36 +462,20 @@ The top-k trend also illustrates the context-size tradeoff. Increasing k makes i
 
 \subsection{Cross-Model Comparison}
 
-Table~\ref{tab:cross-model} compares models under the same vector top-8 context and strict citation prompt.
-
-\begin{table}[t]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Model} & \textbf{N} & \textbf{Ans.} & \textbf{Cit.} & \textbf{Hall.} \\
-\midrule
-\texttt{gpt-4.1-mini} & 50 & 60.0\% & 67.5\% & 6.0\% \\
-\texttt{gpt-4.1} & 50 & 54.0\% & 60.0\% & 2.0\% \\
-Claude & 50 & 56.0\% & 60.0\% & 2.0\% \\
-Gemini & 23 & 47.8\% & 20.0\% & 4.3\% \\
-\bottomrule
-\end{tabular}
-\caption{Cross-model comparison using saved vector top-8 context and strict citation prompting.}
-\label{tab:cross-model}
-\end{table}
+Table~\ref{tab:cross-model-full} compares models under the same vector top-8 context and strict citation prompt.
 
 The cross-model results show that a stronger or different model family did not automatically solve the retrieval-grounding problem. \texttt{gpt-4.1-mini} achieved the highest answer accuracy in the full available comparison, while \texttt{gpt-4.1} and Claude had lower hallucination rates. Gemini was evaluated on only 23 generated rows due to generation limits, so its full-run result should be interpreted cautiously.
 
 The full available comparison shows different tradeoffs. \texttt{gpt-4.1-mini} answered more questions correctly but also had the highest hallucination rate among the full 50-row runs. \texttt{gpt-4.1} and Claude had lower hallucination rates, but lower strict answer accuracy. This suggests that lower hallucination can come from more conservative behavior, not necessarily from better final-answer performance. In a strict citation setting, a model that refuses often may look safer but less accurate.
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrrrrrrr}
 \toprule
-\textbf{Model} & \textbf{Rows} & \textbf{Ans. Acc.} & \textbf{Ans. Score} & \textbf{Cit. Acc.} & \textbf{Cit. Score} & \textbf{Halluc.} & \textbf{Cit. Rows} \\
+\textbf{Model} & \textbf{N} & \textbf{Ans.} & \textbf{Ans. Score} & \textbf{Cit.} & \textbf{Cit. Score} & \textbf{Hall.} & \textbf{Cit. N} \\
 \midrule
 \texttt{gpt-4.1-mini} & 50 & 60.0\% & 65.0\% & 67.5\% & 80.0\% & 6.0\% & 40 \\
 \texttt{gpt-4.1} & 50 & 54.0\% & 55.0\% & 60.0\% & 78.3\% & 2.0\% & 30 \\
@@ -498,31 +483,14 @@ Claude & 50 & 56.0\% & 64.0\% & 60.0\% & 79.0\% & 2.0\% & 50 \\
 Gemini & 23 & 47.8\% & 47.8\% & 20.0\% & 23.3\% & 4.3\% & 15 \\
 \bottomrule
 \end{tabular}
+}
 \caption{Full available cross-model metrics with partial-credit scores and citation denominators.}
 \label{tab:cross-model-full}
-\end{table*}
+\end{table}
 
 The citation denominator is also informative. Claude produced evaluable citations for all 50 rows, while \texttt{gpt-4.1} produced evaluable citations for 30 rows and \texttt{gpt-4.1-mini} for 40 rows. This affects how citation accuracy should be interpreted. A model with fewer evaluable citations may be refusing more often or giving uncited refusals, which changes the citation denominator. Reporting only citation accuracy without the evaluated count can therefore be misleading.
 
-To compare all models on the same question subset, Table~\ref{tab:first20} reports a first-20 comparison.
-
-\begin{table}[t]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Model} & \textbf{N} & \textbf{Ans.} & \textbf{Cit.} & \textbf{Hall.} \\
-\midrule
-\texttt{gpt-4.1-mini} & 20 & 55.0\% & 73.3\% & 10.0\% \\
-\texttt{gpt-4.1} & 20 & 55.0\% & 58.3\% & 0.0\% \\
-Claude & 20 & 55.0\% & 55.0\% & 0.0\% \\
-Gemini & 20 & 50.0\% & 23.1\% & 5.0\% \\
-\bottomrule
-\end{tabular}
-\caption{Fair first-20 cross-model comparison.}
-\label{tab:first20}
-\end{table}
+To compare all models on the same question subset, Table~\ref{tab:first20-full} reports a first-20 comparison.
 
 The first-20 comparison suggests that model choice affects citation behavior and hallucination rate, but retrieval completeness remains a central bottleneck.
 
@@ -530,12 +498,14 @@ The first-20 subset helps control for Gemini's incomplete full run. On the share
 
 The first-20 hallucination pattern is also useful. \texttt{gpt-4.1} and Claude had 0.0\% hallucination on the first-20 subset, while \texttt{gpt-4.1-mini} had 10.0\% and Gemini had 5.0\%. This supports a cautious interpretation: stronger or more conservative models may reduce unsupported claims, but they may not improve answer accuracy when the retrieved evidence is incomplete. In other words, generator quality and retrieval quality interact.
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrrrrrr}
 \toprule
-\textbf{Model} & \textbf{Rows} & \textbf{Ans. Acc.} & \textbf{Ans. Score} & \textbf{Cit. Acc.} & \textbf{Cit. Score} & \textbf{Halluc.} \\
+\textbf{Model} & \textbf{N} & \textbf{Ans.} & \textbf{Ans. Score} & \textbf{Cit.} & \textbf{Cit. Score} & \textbf{Hall.} \\
 \midrule
 \texttt{gpt-4.1-mini} & 20 & 55.0\% & 57.5\% & 73.3\% & 80.0\% & 10.0\% \\
 \texttt{gpt-4.1} & 20 & 55.0\% & 55.0\% & 58.3\% & 79.2\% & 0.0\% \\
@@ -543,9 +513,10 @@ Claude & 20 & 55.0\% & 60.0\% & 55.0\% & 77.5\% & 0.0\% \\
 Gemini & 20 & 50.0\% & 50.0\% & 23.1\% & 26.9\% & 5.0\% \\
 \bottomrule
 \end{tabular}
+}
 \caption{First-20 comparison with partial-credit scores.}
 \label{tab:first20-full}
-\end{table*}
+\end{table}
 
 \section{Error Analysis}
 
