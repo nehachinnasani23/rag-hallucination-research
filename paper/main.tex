@@ -1,0 +1,291 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\title{Evaluating Hallucination and Citation Accuracy in Retrieval-Augmented Question Answering Using Gold and Retrieved Evidence}
+\author{Neha Reddy Chinnasani}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Retrieval-augmented generation (RAG) is commonly used to ground large language model outputs in external documents, but retrieval alone does not guarantee correctness, faithfulness, or citation quality. This paper presents a pilot evaluation framework for measuring answer accuracy, citation accuracy, retrieval completeness, and hallucination in RAG-based question answering. We construct a sentence-level evaluation set from HotpotQA, using its gold answers and supporting facts as reference evidence. We compare a best-case gold-evidence condition against a realistic vector-retrieval condition and evaluate multiple models under the same strict citation prompt. In the gold-evidence condition, \texttt{gpt-4.1-mini} achieved 88.0\% answer accuracy, 87.5\% citation accuracy, and 0.0\% hallucination over 25 labeled questions. Under vector top-8 retrieval, the same model dropped to 60.0\% answer accuracy, 67.5\% citation accuracy, and 6.0\% hallucination over 50 labeled questions. Retrieval analysis showed that vector top-8 retrieved at least one gold supporting sentence for 100.0\% of questions but retrieved all gold supporting sentences for only 52.0\%. These results suggest that partial evidence retrieval is a major failure mode for multi-hop RAG: a model may receive relevant evidence while still lacking the complete evidence chain needed for a correct, fully supported answer.
+\end{abstract}
+
+\noindent\textbf{Keywords:} retrieval-augmented generation, hallucination, citation accuracy, RAG evaluation, question answering, HotpotQA
+
+\section{Introduction}
+
+Large language models are increasingly used as question-answering assistants over document collections such as knowledge bases, policy manuals, technical documentation, and customer support articles. Retrieval-augmented generation (RAG) attempts to improve factual grounding by retrieving external context before generating an answer \citep{lewis2020rag}. Although RAG can reduce unsupported generation, it does not eliminate hallucination. A RAG system can retrieve incomplete evidence, cite passages that do not support the generated answer, or overgeneralize from partially relevant context.
+
+This creates an important evaluation problem. In many deployed systems, a generated answer appears more trustworthy when it includes citations. However, citation presence is not the same as citation correctness. A citation may point to a related passage while failing to support the exact answer. For multi-hop questions, the problem is even sharper: the model may need several supporting facts, and retrieving only one of them may be insufficient.
+
+This study asks:
+
+\begin{quote}
+How do answer accuracy, citation accuracy, and hallucination rate change when a RAG system uses gold supporting evidence versus automatically retrieved evidence?
+\end{quote}
+
+We present a small but reproducible pilot study using HotpotQA \citep{yang2018hotpotqa}. The study focuses on separating three sources of error: retrieval failure, reasoning failure, and citation failure. Our main finding is that vector retrieval can appear successful under a weak retrieval metric, such as retrieving any gold evidence, while still failing to retrieve the complete evidence chain needed for a correct answer.
+
+\section{Related Work}
+
+RAG was introduced as a way to combine parametric language models with non-parametric retrieved memory for knowledge-intensive tasks \citep{lewis2020rag}. Since then, retrieval-based grounding has become a common strategy for improving factuality in question answering and generative search. However, retrieval quality, answer quality, and citation quality must be evaluated separately.
+
+HotpotQA provides multi-hop questions with sentence-level supporting facts, making it useful for evaluating whether a system can retrieve and reason over multiple pieces of evidence \citep{yang2018hotpotqa}. Retrieval benchmarks such as BEIR emphasize the need to evaluate retrieval systems across diverse tasks and domains \citep{thakur2021beir}. In the RAG setting, retrieval quality is only one part of the problem: even when relevant context is retrieved, the model must still generate a faithful and well-cited answer.
+
+Prior work on verifiability in generative search has argued that citations should be judged by whether they actually support the claims they accompany \citep{liu2023verifiability}. Automated RAG evaluation frameworks such as RAGAS and ARES evaluate dimensions such as faithfulness, answer relevance, and context relevance \citep{es2023ragas, saadfalcon2024ares}. RAGTruth further highlights that hallucinations remain present in RAG outputs and require explicit evaluation \citep{niu2024ragtruth}. This paper contributes a compact, human-labeled evaluation workflow that directly compares gold evidence, retrieved evidence, citation accuracy, and hallucination rate.
+
+\section{Dataset and Task}
+
+The evaluation uses a 50-question sample derived from HotpotQA. Each example contains:
+
+\begin{itemize}[leftmargin=*]
+    \item a question,
+    \item an expected answer,
+    \item sentence-level source documents,
+    \item expected supporting sentence identifiers, and
+    \item an answerability label.
+\end{itemize}
+
+The source documents are converted into sentence-level records with IDs such as \texttt{S000001}. The model is instructed to answer using only the provided context and cite supporting sentence IDs. The task is therefore not only to answer correctly, but also to cite evidence that supports the answer.
+
+HotpotQA is especially appropriate for this pilot because many questions require multi-hop reasoning. A model may need one sentence to identify an entity and another sentence to answer the final question. This allows the experiment to test whether retrieval returns the full evidence chain, not merely a related passage.
+
+\section{Methodology}
+
+\subsection{RAG Conditions}
+
+We evaluate the following completed conditions:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{p{0.26\linewidth}p{0.62\linewidth}}
+\toprule
+\textbf{Condition} & \textbf{Description} \\
+\midrule
+Gold evidence & The model receives the benchmark supporting facts. This is a best-case evidence condition. \\
+Vector top-8 retrieval & The system retrieves the top eight source sentences using a vector index and cosine similarity. \\
+Saved vector top-8 cross-model comparison & Multiple models receive the same saved vector top-8 context, controlling retrieval while changing only the generator model. \\
+\bottomrule
+\end{tabular}
+\caption{Completed experimental conditions.}
+\label{tab:conditions}
+\end{table}
+
+All answer-generation experiments used a strict citation prompt. The prompt instructed the model to use only the provided context, cite source sentence IDs, avoid outside knowledge, and state that the document does not provide enough information when the context is insufficient.
+
+\subsection{Models}
+
+The completed cross-model comparison includes:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{gpt-4.1-mini},
+    \item \texttt{gpt-4.1},
+    \item \texttt{claude-sonnet-4-5}, and
+    \item \texttt{gemini-2.5-flash}.
+\end{itemize}
+
+For the cross-model experiment, all models received the same saved vector top-8 retrieved context. This controls for retrieval differences and isolates generator behavior.
+
+\subsection{Human Labeling}
+
+Each generated answer was manually labeled using the following columns:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{answer\_correct}: \texttt{yes}, \texttt{partial}, or \texttt{no},
+    \item \texttt{citation\_correct}: \texttt{yes}, \texttt{partial}, \texttt{no}, or \texttt{na},
+    \item \texttt{hallucination}: \texttt{yes} or \texttt{no},
+    \item \texttt{refusal\_correct}: used for unanswerable questions, and
+    \item \texttt{notes}: short explanation of the label.
+\end{itemize}
+
+The scoring script computes metrics from these label columns. It does not hardcode or automatically infer correctness.
+
+\section{Evaluation Metrics}
+
+We report five core metrics.
+
+\paragraph{Strict answer accuracy.}
+The percentage of scored answers labeled \texttt{answer\_correct=yes}. Partial answers are not counted as correct in strict accuracy.
+
+\paragraph{Partial-credit answer score.}
+The average answer score where \texttt{yes}=1.0, \texttt{partial}=0.5, and \texttt{no}=0.0.
+
+\paragraph{Strict citation accuracy.}
+The percentage of evaluated citations labeled \texttt{citation\_correct=yes}. Rows with \texttt{citation\_correct=na} are excluded from the citation denominator.
+
+\paragraph{Partial-credit citation score.}
+The average citation score where \texttt{yes}=1.0, \texttt{partial}=0.5, and \texttt{no}=0.0.
+
+\paragraph{Hallucination rate.}
+The percentage of scored answers labeled \texttt{hallucination=yes}. In this study, hallucination means that the answer includes unsupported, invented, or source-unjustified information.
+
+\paragraph{Retrieval completeness.}
+For each question, we compare retrieved sentence IDs against expected supporting sentence IDs. We measure whether any gold evidence was retrieved, whether all gold evidence was retrieved, and mean citation recall.
+
+\section{Results}
+
+\subsection{Gold Evidence vs. Vector Retrieval}
+
+Table~\ref{tab:gold-vector} compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Setting} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
+\midrule
+Gold evidence & 25 & 88.0\% & 87.5\% & 0.0\% \\
+Vector top-8 & 50 & 60.0\% & 67.5\% & 6.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Gold evidence compared with vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
+\label{tab:gold-vector}
+\end{table}
+
+The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition, although the two conditions currently differ in sample size. A fair next step is to run the gold-evidence condition on all 50 rows.
+
+\subsection{Retrieval Quality}
+
+Table~\ref{tab:retrieval-quality} shows retrieval completeness for vector retrieval.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rrrr}
+\toprule
+\textbf{k} & \textbf{Any Gold Retrieved} & \textbf{All Gold Retrieved} & \textbf{Mean Citation Recall} \\
+\midrule
+1 & 84.0\% & 0.0\% & 36.7\% \\
+3 & 94.0\% & 26.0\% & 58.9\% \\
+5 & 98.0\% & 38.0\% & 69.9\% \\
+8 & 100.0\% & 52.0\% & 78.9\% \\
+\bottomrule
+\end{tabular}
+\caption{Retrieval completeness for saved vector retrieval.}
+\label{tab:retrieval-quality}
+\end{table}
+
+The top-8 retriever found at least one gold supporting sentence for every question, but retrieved all gold supporting sentences for only 52.0\% of questions. This explains why vector retrieval can look strong under an ``any relevant evidence'' metric while still failing many multi-hop questions. For multi-hop RAG, partial evidence is often not enough.
+
+\subsection{Cross-Model Comparison}
+
+Table~\ref{tab:cross-model} compares models under the same vector top-8 context and strict citation prompt.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Model} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
+\midrule
+\texttt{gpt-4.1-mini} & 50 & 60.0\% & 67.5\% & 6.0\% \\
+\texttt{gpt-4.1} & 50 & 54.0\% & 60.0\% & 2.0\% \\
+Claude & 50 & 56.0\% & 60.0\% & 2.0\% \\
+Gemini & 23 & 47.8\% & 20.0\% & 4.3\% \\
+\bottomrule
+\end{tabular}
+\caption{Cross-model comparison using saved vector top-8 context and strict citation prompting.}
+\label{tab:cross-model}
+\end{table}
+
+The cross-model results show that a stronger or different model family did not automatically solve the retrieval-grounding problem. \texttt{gpt-4.1-mini} achieved the highest answer accuracy in the full available comparison, while \texttt{gpt-4.1} and Claude had lower hallucination rates. Gemini was evaluated on only 23 generated rows due to generation limits, so its full-run result should be interpreted cautiously.
+
+To compare all models on the same question subset, Table~\ref{tab:first20} reports a first-20 comparison.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Model} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
+\midrule
+\texttt{gpt-4.1-mini} & 20 & 55.0\% & 73.3\% & 10.0\% \\
+\texttt{gpt-4.1} & 20 & 55.0\% & 58.3\% & 0.0\% \\
+Claude & 20 & 55.0\% & 55.0\% & 0.0\% \\
+Gemini & 20 & 50.0\% & 23.1\% & 5.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Fair first-20 cross-model comparison.}
+\label{tab:first20}
+\end{table}
+
+The first-20 comparison suggests that model choice affects citation behavior and hallucination rate, but retrieval completeness remains a central bottleneck.
+
+\section{Error Analysis}
+
+The labeled outputs revealed several recurring error patterns.
+
+\paragraph{Retrieval miss.}
+Some questions were answerable in the benchmark, but the retrieved context did not include the sentence needed for the final answer. In these cases, strict prompting often led the model to refuse. This reduced hallucination but also reduced answer accuracy.
+
+\paragraph{Partial evidence.}
+The most important observed pattern was partial evidence retrieval. The retriever often returned one correct supporting sentence but missed another sentence needed for the multi-hop reasoning chain. This produced partial answers, overcautious refusals, or weak citations.
+
+\paragraph{Unsupported citation.}
+Some answers were factually correct but cited a sentence that did not fully support the answer. This shows why citation accuracy should be evaluated separately from answer accuracy.
+
+\paragraph{Overcautious refusal.}
+The strict citation prompt sometimes caused models to refuse even when enough context was arguably present. This behavior reduces hallucination risk but lowers answer accuracy.
+
+\paragraph{Unsupported inference.}
+In a small number of cases, the model supplied a correct answer using a fact not actually supported by the retrieved context. These cases were labeled as hallucinations because the answer was not grounded in the provided evidence.
+
+A formal error taxonomy with counts for each category remains future work. The current study records notes for wrong and partial answers, but a next version should add an explicit \texttt{error\_type} column and count retrieval misses, partial evidence errors, reasoning failures, unsupported claims, wrong citations, overgeneralizations, and missing refusals.
+
+\section{Discussion}
+
+The main result is that retrieval completeness is more important than simple relevance. Vector top-8 retrieval achieved 100.0\% any-gold recall, but all-gold recall was only 52.0\%. In a multi-hop setting, retrieving one relevant sentence may still leave the model without enough evidence to answer.
+
+This finding has two implications. First, RAG evaluation should include retrieval-side metrics in addition to answer-side metrics. Second, citation evaluation should check whether citations actually support the answer, not merely whether a citation is present. The observed drop from 87.5\% citation accuracy in the gold-evidence condition to 67.5\% in the vector condition shows that citation quality depends strongly on evidence quality.
+
+Strict citation prompting appears useful for reducing unsupported answers, but it cannot compensate for missing evidence. When evidence is incomplete, the prompt may push the model toward refusal. This is safer than hallucination, but it still produces an incorrect answer for answerable benchmark questions.
+
+\section{Limitations}
+
+This study is a pilot and has several limitations.
+
+\begin{itemize}[leftmargin=*]
+    \item The gold-evidence baseline currently covers 25 rows, while the main vector baseline covers 50 rows. A fair final version should run gold evidence on all 50 rows.
+    \item Gemini currently has 23 generated rows in the full comparison because generation stopped before all 50 rows were completed.
+    \item The top-k answer comparison for k=1, 3, 5, 8, and 10 has not yet been completed. Retrieval completeness was computed for k=1, 3, 5, and 8, but model answer generation was only scored for top-8.
+    \item The unanswerable-question test was skipped in the current reported experiment. Therefore, refusal accuracy, false answer rate on unanswerable questions, and unsupported citation rate on unanswerable questions are not reported.
+    \item Human labels were assigned by a single annotator. Future work should include double annotation and adjudication for reliability.
+    \item HotpotQA is a benchmark dataset, not a real enterprise knowledge base, so enterprise generalization should be made cautiously.
+\end{itemize}
+
+\section{Conclusion}
+
+This paper presented a pilot evaluation of hallucination and citation accuracy in RAG-based question answering. The results show that gold evidence produces substantially better answer and citation accuracy than vector-retrieved evidence. The retrieval analysis explains why: vector retrieval often found relevant evidence but failed to retrieve the full evidence chain required for multi-hop questions.
+
+The central conclusion is that RAG quality depends on complete evidence, not merely relevant evidence. A robust RAG evaluation should therefore measure answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. Future work will complete the 50-row gold baseline, run top-k answer comparisons, add unanswerable questions, and produce a formal error taxonomy with category-level counts.
+
+\section*{Final Next-Step Checklist}
+
+\begin{enumerate}[leftmargin=*]
+    \item Run gold evidence on all 50 rows for a fair comparison.
+    \item Run top-k answer comparison for k=1, 3, 5, 8, and 10.
+    \item Add retrieval completeness metrics for each k.
+    \item Add an explicit error taxonomy label for every wrong or partial answer.
+    \item Update the Results and Error Analysis sections with the new counts.
+    \item Finalize the GitHub README and reproduction instructions.
+    \item Publish the Medium blog after the paper draft is stable.
+\end{enumerate}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
