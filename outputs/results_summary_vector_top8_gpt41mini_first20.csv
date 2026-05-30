@@ -1,0 +1,2 @@
+model_name,setting,generated_answers,total_questions,answer_correct_count,answer_accuracy,answer_score_points,answer_score,citation_correct_count,citation_evaluated_count,citation_accuracy,citation_score_points,citation_score,hallucination_count,hallucination_rate,refusal_correct_count,unanswerable_evaluated_count,refusal_accuracy,false_answer_count,false_answer_rate,unsupported_citation_count,unsupported_citation_rate
+gpt-4.1-mini,strict_citation_rag,20,20,11,55.0%,11.5,57.5%,11,15,73.3%,12,80.0%,2,10.0%,0,0,n/a,0,n/a,0,n/a

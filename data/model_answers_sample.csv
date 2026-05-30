@@ -1,0 +1,9 @@
+question_id,model_name,answer,cited_source,answer_correct,citation_correct,hallucination,refusal_correct,notes
+Q1,Sample-RAG-A,"Employees receive 12 paid vacation days per year.",S1,yes,yes,no,na,"Correct answer and correct citation."
+Q2,Sample-RAG-A,"Employees can work remotely every Friday without approval.",S2,no,no,yes,na,"The source requires manager approval and does not say every Friday."
+Q3,Sample-RAG-A,"Health insurance begins after 30 days of employment.",S3,partial,yes,no,na,"The answer misses the first-day-of-the-month detail."
+Q4,Sample-RAG-A,"Employees may request equipment reimbursement up to $500 with receipts.",S4,yes,yes,no,na,"Correct answer and correct citation."
+Q5,Sample-RAG-A,"Yes, employees receive free lunch on Fridays.",S4,no,no,yes,no,"Free lunch is not mentioned in the source."
+Q6,Sample-RAG-A,"The document does not provide enough information about working from another country.","",yes,na,no,yes,"Correct refusal."
+Q7,Sample-RAG-A,"Job-related training courses may be reimbursed with manager approval before enrollment.",S5,yes,yes,no,na,"Correct answer and correct citation."
+Q8,Sample-RAG-A,"Employees receive 10 sick leave days per year.",S6,no,no,yes,no,"Sick leave is not mentioned in the source."

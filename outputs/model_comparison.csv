@@ -1,0 +1,5 @@
+experiment,answer_file,provider,model_name,setting,generated_answers,total_questions,answer_correct_count,answer_accuracy,answer_score_points,answer_score,citation_correct_count,citation_evaluated_count,citation_accuracy,citation_score_points,citation_score,hallucination_count,hallucination_rate,refusal_correct_count,unanswerable_evaluated_count,refusal_accuracy,false_answer_count,false_answer_rate,unsupported_citation_count,unsupported_citation_rate
+gpt-4.1-mini,data/hotpotqa_vector_answers_raw.csv,openai,gpt-4.1-mini,strict_citation_rag,50,50,30,60.0%,32.5,65.0%,27,40,67.5%,32,80.0%,3,6.0%,0,0,n/a,0,n/a,0,n/a
+gpt-4.1,data/hotpotqa_vector_gpt41_answers_raw.csv,openai,gpt-4.1,strict_citation_rag,50,50,27,54.0%,27.5,55.0%,18,30,60.0%,23.5,78.3%,1,2.0%,0,0,n/a,0,n/a,0,n/a
+Claude,data/hotpotqa_vector_claude_answers_raw.csv,anthropic,claude-sonnet-4-5,strict_citation_rag,50,50,28,56.0%,32,64.0%,30,50,60.0%,39.5,79.0%,1,2.0%,0,0,n/a,0,n/a,0,n/a
+Gemini,data/hotpotqa_vector_gemini_answers_raw.csv,gemini,gemini-2.5-flash,strict_citation_rag,23,23,11,47.8%,11,47.8%,3,15,20.0%,3.5,23.3%,1,4.3%,0,0,n/a,0,n/a,0,n/a

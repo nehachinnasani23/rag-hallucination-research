@@ -1,0 +1,51 @@
+question_id,question,expected_answer,expected_citation,answerable
+HQ0001,Were Scott Derrickson and Ed Wood of the same nationality?,yes,S000004 S000017,yes
+HQ0002,What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?,Chief of Protocol,S000041 S000042 S000054,yes
+HQ0003,"What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",Animorphs,S000084 S000085 S000086 S000114 S000115,yes
+HQ0004,Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?,no,S000140 S000141,yes
+HQ0005,"The director of the romantic comedy ""Big Stone Gap"" is based in what New York city?","Greenwich Village, New York City",S000156 S000196,yes
+HQ0006,2014 S/S is the debut album of a South Korean boy group that was formed by who?,YG Entertainment,S000210 S000217,yes
+HQ0007,Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?,Eenasul Fateh,S000264 S000278,yes
+HQ0008,The arena where the Lewiston Maineiacs played their home games can seat how many people?,"3,677 seated",S000350 S000360,yes
+HQ0009,"Who is older, Annie Morton or Terry Richardson?",Terry Richardson,S000371 S000373 S000381,yes
+HQ0010,Are Local H and For Against both from the United States?,yes,S000430 S000440,yes
+HQ0011,"What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",Kansas Song,S000481 S000498 S000499,yes
+HQ0012,"What screenwriter with credits for ""Evolution"" co-wrote a film starring Nicolas Cage and Téa Leoni?",David Weissman,S000520 S000521 S000539,yes
+HQ0013,What year did Guns N Roses perform a promo for a movie starring Arnold Schwarzenegger as a former New York Police detective?,1999,S000580 S000581 S000582,yes
+HQ0014,Are Random House Tower and 888 7th Avenue both used for real estate?,no,S000601 S000604,yes
+HQ0015,The football manager who recruited David Beckham managed Manchester United during what timeframe?,from 1986 to 2013,S000665 S000666 S000675,yes
+HQ0016,Brown State Fishing Lake is in a country that has a population of how many inhabitants ?,"9,984",S000688 S000740,yes
+HQ0017,The Vermont Catamounts men's soccer team currently competes in a conference that was formerly known as what from 1988 to 1996?,the North Atlantic Conference,S000757 S000758 S000759,yes
+HQ0018,Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?,yes,S000797 S000801,yes
+HQ0019,Roger O. Egeberg was Assistant Secretary for Health and Scientific Affairs during the administration of a president that served during what years?,1969 until 1974,S000828 S000858,yes
+HQ0020,"Which writer was from England, Henry Roth or Robert Erskine Childers?",Robert Erskine Childers DSC,S000868 S000882,yes
+HQ0021,Which other Mexican Formula One race car driver has held the podium besides the Force India driver born in 1990?,Pedro Rodríguez,S000915 S000931 S000932,yes
+HQ0022,This singer of A Rather Blustery Day also voiced what hedgehog?,Sonic,S000964 S000979,yes
+HQ0023,"Aside from the Apple Remote, what other device can control the program Apple Remote was originally designed to interact with?",keyboard function keys,S000993 S000994 S001009 S001010,yes
+HQ0024,"Which performance act has a higher instrument to person ratio, Badly Drawn Boy or Wolf Alice? ",Badly Drawn Boy,S001039 S001058,yes
+HQ0025,What was the father of Kasper Schmeichel voted to be by the IFFHS in 1992?,World's Best Goalkeeper,S001073 S001093 S001094,yes
+HQ0026,Who was the writer of These Boots Are Made for Walkin' and who died in 2007?,Barton Lee Hazlewood,S001131 S001136,yes
+HQ0027,"The 2011–12 VCU Rams men's basketball team, led by third year head coach Shaka Smart, represented Virginia Commonwealth University which was founded in what year?",1838,S001153 S001166,yes
+HQ0028,"Are both Dictyosperma, and Huernia described as a genus?",yes,S001199 S001204,yes
+HQ0029,Kaiser Ventures corporation was founded by an American industrialist who became known as the father of modern American shipbuilding?,Henry J. Kaiser,S001224 S001225 S001230,yes
+HQ0030,"What is the name for the adventure in ""Tunnels and Trolls"", a game designed by Ken St. Andre?",Arena of Khazan,S001245 S001273,yes
+HQ0031,"When was Poison's album ""Shut Up, Make Love"" released?",2000,S001295 S001315,yes
+HQ0032,"Hayden is a singer-songwriter from Canada, but where does Buck-Tick hail from?","Fujioka, Gunma",S001324 S001335,yes
+HQ0033,Which  French ace pilot and adventurer fly L'Oiseau Blanc,Charles Eugène,S001366 S001386,yes
+HQ0034,Are Freakonomics and In the Realm of the Hackers both American documentaries?,no,S001428 S001431,yes
+HQ0035,"Which band, Letters to Cleo or Screaming Trees, had more members?",Letters to Cleo,S001439 S001440 S001469 S001470,yes
+HQ0036,Alexander Kerensky was defeated and destroyed by the Bolsheviks in the course of a civil war that ended when ?,October 1922,S001484 S001512,yes
+HQ0037,Seven Brief Lessons on Physics was written by an Italian physicist that has worked in France since what year?,2000,S001549 S001562,yes
+HQ0038,"The Livesey Hal War Memorial commemorates the fallen of which war, that had over 60 million casualties?",World War II,S001565 S001591,yes
+HQ0039,Are both Elko Regional Airport and Gerald R. Ford International Airport located in Michigan?,no,S001606 S001607,yes
+HQ0040,Ralph Hefferline was a psychology professor at a university that is located in what city?,New York City,S001665 S001671,yes
+HQ0041,Which dog's ancestors include Gordon and Irish Setters: the Manchester Terrier or the Scotch Collie?,Scotch Collie,S001681 S001710 S001713,yes
+HQ0042,Where is the company that Sachin Warrier worked for as a software engineer headquartered? ,Mumbai,S001738 S001746,yes
+HQ0043,"A Japanese manga series based on a 16 year old high school student Ichitaka Seto, is written and illustrated by someone born in what year?",1962,S001775 S001824,yes
+HQ0044,The battle in which Giuseppe Arimondi lost his life secured what for Ethiopia?,sovereignty,S001857 S001869,yes
+HQ0045,Alfred Balk served as the secretary of the Committee on the Employment of Minority Groups in the News Media under which United States Vice President?,Nelson Rockefeller,S001885 S001940 S001942,yes
+HQ0046,"A medieval fortress in Dirleton, East Lothian, Scotland borders on the south side of what coastal area?",Yellowcraig,S001966 S001967 S001968 S001969,yes
+HQ0047,Who is the writer of this song that was inspired by words on a tombstone and was the first track on the box set Back to Mono?,Phil Spector,S001992 S001993 S002030,yes
+HQ0048,What type of forum did a former Soviet statesman initiate?,Organizations could come together to address global issues,S002066 S002073,yes
+HQ0049,Are Ferocactus and Silene both types of plant?,yes,S002101 S002133,yes
+HQ0050,Which British first-generation jet-powered medium bomber was used in the South West Pacific theatre of World War II?,English Electric Canberra,S002149 S002156,yes

@@ -1,0 +1,2 @@
+model_name,setting,generated_answers,total_questions,answer_correct_count,answer_accuracy,answer_score_points,answer_score,citation_correct_count,citation_evaluated_count,citation_accuracy,citation_score_points,citation_score,hallucination_count,hallucination_rate,refusal_correct_count,unanswerable_evaluated_count,refusal_accuracy,false_answer_count,false_answer_rate,unsupported_citation_count,unsupported_citation_rate
+claude-sonnet-4-5,strict_citation_rag,50,50,28,56.0%,32,64.0%,30,50,60.0%,39.5,79.0%,1,2.0%,0,0,n/a,0,n/a,0,n/a

@@ -1,0 +1,16 @@
+You are answering questions using only the provided source document.
+
+Rules:
+1. Use only information from the source.
+2. Cite the sentence ID that supports your answer, such as [S1].
+3. If the source does not contain the answer, say: "The document does not provide enough information."
+4. Do not guess.
+5. Do not use outside knowledge.
+
+Source:
+{source_context}
+
+Question:
+{question}
+
+Answer:

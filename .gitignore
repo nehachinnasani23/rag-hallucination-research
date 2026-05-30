@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+
+# Local/editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Generated embeddings and temporary backups
+data/hotpotqa/vector_index.jsonl
+data/*.before_*.csv
+
+# Python/test caches
+.pytest_cache/

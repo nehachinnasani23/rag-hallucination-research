@@ -1,0 +1,2 @@
+model_name,setting,generated_answers,total_questions,answer_correct_count,answer_accuracy,answer_score_points,answer_score,citation_correct_count,citation_evaluated_count,citation_accuracy,citation_score_points,citation_score,hallucination_count,hallucination_rate,refusal_correct_count,unanswerable_evaluated_count,refusal_accuracy,false_answer_count,false_answer_rate,unsupported_citation_count,unsupported_citation_rate
+gemini-2.5-flash,strict_citation_rag,23,23,11,47.8%,11,47.8%,3,15,20.0%,3.5,23.3%,1,4.3%,0,0,n/a,0,n/a,0,n/a

@@ -1,0 +1,9 @@
+question_id,question,expected_answer,expected_citation,answerable
+Q1,"How many paid vacation days do employees receive?","Employees receive 12 paid vacation days per year.","S1",yes
+Q2,"How many days per week can employees work remotely?","Remote work is allowed up to two days per week with manager approval.","S2",yes
+Q3,"When does health insurance begin?","Health insurance begins on the first day of the month after 30 days of employment.","S3",yes
+Q4,"What is the equipment reimbursement limit?","Employees may request reimbursement for approved work equipment up to $500 with receipts.","S4",yes
+Q5,"Do employees receive free lunch?","The document does not provide enough information.","",no
+Q6,"Can employees work from another country?","The document does not provide enough information.","",no
+Q7,"Are job-related training courses reimbursed?","Job-related training courses may be reimbursed if the employee receives manager approval before enrollment.","S5",yes
+Q8,"What is the sick leave policy?","The document does not provide enough information.","",no

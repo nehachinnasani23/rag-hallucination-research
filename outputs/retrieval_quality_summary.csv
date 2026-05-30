@@ -1,0 +1,5 @@
+k,question_count,any_gold_count,any_gold_rate,all_gold_count,all_gold_rate,mean_gold_citation_recall
+1,50,42,84.0%,0,0.0%,36.7%
+3,50,47,94.0%,13,26.0%,58.9%
+5,50,49,98.0%,19,38.0%,69.9%
+8,50,50,100.0%,26,52.0%,78.9%
