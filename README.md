@@ -13,7 +13,7 @@ The experiment asks models HotpotQA-style multi-hop questions using source-docum
 - gold evidence vs. retrieved evidence
 - vector retrieval quality at different `k` values
 - strict citation prompting
-- cross-model behavior across OpenAI, Claude, and Gemini
+- cross-model behavior across OpenAI, Claude, Gemini, and DeepSeek
 
 The scoring script does not automatically decide correctness. Model answers are generated first, then human labels are filled in the answer CSVs:
 
@@ -93,6 +93,7 @@ Optional API keys for model generation:
 export OPENAI_API_KEY="your_openai_key"
 export ANTHROPIC_API_KEY="your_anthropic_key"
 export GEMINI_API_KEY="your_gemini_key"
+export DEEPSEEK_API_KEY="your_deepseek_key"
 ```
 
 Do not commit real API keys. Use `.env.example` only as a template.
@@ -137,7 +138,23 @@ python3 src/main.py \
   --output data/hotpotqa_vector_gpt41_answers_raw.csv
 ```
 
-Use `--provider anthropic --model claude-sonnet-4-5` for Claude and `--provider gemini --model gemini-2.5-flash` for Gemini.
+Use `--provider anthropic --model claude-sonnet-4-5` for Claude, `--provider gemini --model gemini-2.5-flash` for Gemini, and `--provider deepseek --model deepseek-chat` for DeepSeek.
+
+DeepSeek vector top-8 command:
+
+```bash
+python3 src/main.py \
+  --questions data/hotpotqa/questions.csv \
+  --source-dir data/hotpotqa/source_documents \
+  --retrieval saved \
+  --saved-retrieval-answers data/hotpotqa_vector_answers_raw.csv \
+  --top-k 8 \
+  --limit 50 \
+  --settings strict_citation_rag \
+  --provider deepseek \
+  --model deepseek-chat \
+  --output data/hotpotqa_vector_deepseek_answers_raw.csv
+```
 
 ## Evaluate Metrics
 
@@ -161,6 +178,7 @@ python3 src/compare_answer_files.py \
   --answer-file gpt-4.1=data/hotpotqa_vector_gpt41_answers_raw.csv \
   --answer-file Claude=data/hotpotqa_vector_claude_answers_raw.csv \
   --answer-file Gemini=data/hotpotqa_vector_gemini_answers_raw.csv \
+  --answer-file DeepSeek=data/hotpotqa_vector_deepseek_answers_raw.csv \
   --output outputs/model_comparison.csv
 ```
 
