@@ -26,11 +26,10 @@ EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings"
 ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 GEMINI_GENERATE_URL_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-DEEPSEEK_CHAT_COMPLETIONS_URL = "https://api.deepseek.com/chat/completions"
 DEFAULT_GENERATION_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
 DEFAULT_EMBEDDING_MODEL = os.environ.get("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 RETRY_STATUS_CODES = {408, 409, 429, 500, 502, 503, 504}
-GENERATION_PROVIDERS = ("auto", "openai", "anthropic", "gemini", "deepseek", "ollama")
+GENERATION_PROVIDERS = ("auto", "openai", "anthropic", "gemini", "ollama")
 
 SETTINGS = ("no_rag", "basic_rag", "strict_citation_rag")
 
@@ -430,20 +429,6 @@ def extract_gemini_text(response_json: dict[str, object]) -> str:
     return "\n".join(parts).strip()
 
 
-def extract_chat_completion_text(response_json: dict[str, object]) -> str:
-    choices = response_json.get("choices")
-    if not isinstance(choices, list):
-        return ""
-    parts: list[str] = []
-    for choice in choices:
-        if not isinstance(choice, dict):
-            continue
-        message = choice.get("message")
-        if isinstance(message, dict) and isinstance(message.get("content"), str):
-            parts.append(message["content"])
-    return "\n".join(parts).strip()
-
-
 def extract_ollama_text(response_json: dict[str, object]) -> str:
     response = response_json.get("response")
     if isinstance(response, str):
@@ -457,8 +442,6 @@ def infer_generation_provider(model: str) -> str:
         return "anthropic"
     if lower_model.startswith("gemini"):
         return "gemini"
-    if lower_model.startswith("deepseek"):
-        return "deepseek"
     if lower_model.startswith(("llama", "mistral", "mixtral", "qwen", "phi")):
         return "ollama"
     return "openai"
@@ -471,8 +454,6 @@ def generation_api_key(provider: str) -> str | None:
         return os.environ.get("ANTHROPIC_API_KEY")
     if provider == "gemini":
         return os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-    if provider == "deepseek":
-        return os.environ.get("DEEPSEEK_API_KEY")
     if provider == "ollama":
         return None
     raise ValueError(f"Unknown generation provider: {provider}")
@@ -545,32 +526,6 @@ def call_gemini_generation(prompt: str, model: str, api_key: str, max_output_tok
     return answer
 
 
-def call_deepseek_generation(prompt: str, model: str, api_key: str, max_output_tokens: int) -> str:
-    response_json = post_json_with_headers(
-        DEEPSEEK_CHAT_COMPLETIONS_URL,
-        {
-            "model": model,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            "max_tokens": max_output_tokens,
-            "stream": False,
-        },
-        {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        "DeepSeek",
-    )
-    answer = extract_chat_completion_text(response_json)
-    if not answer:
-        raise RuntimeError(f"DeepSeek response did not contain text: {response_json}")
-    return answer
-
-
 def call_ollama_generation(prompt: str, model: str, max_output_tokens: int) -> str:
     base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
     response_json = post_json_with_headers(
@@ -613,11 +568,6 @@ def call_generation_model(
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is required for Gemini generation.")
         return call_gemini_generation(prompt, model, api_key, max_output_tokens)
-
-    if provider == "deepseek":
-        if not api_key:
-            raise RuntimeError("DEEPSEEK_API_KEY is required for DeepSeek generation.")
-        return call_deepseek_generation(prompt, model, api_key, max_output_tokens)
 
     if provider == "ollama":
         return call_ollama_generation(prompt, model, max_output_tokens)
@@ -787,7 +737,6 @@ def main() -> None:
             "openai": "OPENAI_API_KEY",
             "anthropic": "ANTHROPIC_API_KEY",
             "gemini": "GEMINI_API_KEY or GOOGLE_API_KEY",
-            "deepseek": "DEEPSEEK_API_KEY",
         }[provider]
         print(f"{env_var} is required for {provider} generation.", file=sys.stderr)
         sys.exit(1)

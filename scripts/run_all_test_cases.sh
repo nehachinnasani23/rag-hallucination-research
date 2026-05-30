@@ -125,13 +125,6 @@ run_generation_if_possible \
   "GEMINI_API_KEY"
 
 run_generation_if_possible \
-  "DeepSeek" \
-  "deepseek" \
-  "deepseek-chat" \
-  "data/hotpotqa_vector_deepseek_answers_raw.csv" \
-  "DEEPSEEK_API_KEY"
-
-run_generation_if_possible \
   "Llama/Ollama" \
   "ollama" \
   "llama3.1" \
@@ -148,7 +141,6 @@ for item in \
   "gpt-4.1=data/hotpotqa_vector_gpt41_answers_raw.csv" \
   "Claude=data/hotpotqa_vector_claude_answers_raw.csv" \
   "Gemini=data/hotpotqa_vector_gemini_answers_raw.csv" \
-  "DeepSeek=data/hotpotqa_vector_deepseek_answers_raw.csv" \
   "Llama=data/hotpotqa_vector_llama_answers_raw.csv"
 do
   file="${item#*=}"

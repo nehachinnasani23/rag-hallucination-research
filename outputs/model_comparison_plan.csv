@@ -3,5 +3,4 @@ gpt-4.1-mini,Vector top-8,Strict citation,60.0%,67.5%,6.0%,Done,data/hotpotqa_ve
 gpt-4.1,Vector top-8,Strict citation,54.0%,60.0%,2.0%,Done,data/hotpotqa_vector_gpt41_answers_raw.csv
 Claude,Vector top-8,Strict citation,56.0%,60.0%,2.0%,Done,data/hotpotqa_vector_claude_answers_raw.csv
 Gemini,Vector top-8,Strict citation,47.8%,20.0%,4.3%,Done on 23 generated rows,data/hotpotqa_vector_gemini_answers_raw.csv
-DeepSeek,Vector top-8,Strict citation,n/a,n/a,n/a,Blocked by API insufficient balance,data/hotpotqa_vector_deepseek_answers_raw.csv
 Llama,Vector top-8,Strict citation,not_run_yet,not_run_yet,not_run_yet,Planned open/local model comparison,data/hotpotqa_vector_llama_answers_raw.csv

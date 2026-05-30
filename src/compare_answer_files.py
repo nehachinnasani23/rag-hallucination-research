@@ -18,8 +18,6 @@ def infer_provider(model: str) -> str:
         return "anthropic"
     if lower_model.startswith("gemini"):
         return "gemini"
-    if lower_model.startswith("deepseek"):
-        return "deepseek"
     if lower_model.startswith(("llama", "mistral", "mixtral", "qwen", "phi")):
         return "ollama"
     return "openai"
