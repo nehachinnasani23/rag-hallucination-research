@@ -273,7 +273,53 @@ This paper presented a pilot evaluation of hallucination and citation accuracy i
 
 The central conclusion is that RAG quality depends on complete evidence, not merely relevant evidence. A robust RAG evaluation should therefore measure answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. In this experiment, vector retrieval retrieved at least one gold supporting sentence for every question at top-8, but retrieved all gold supporting sentences for only 52.0\% of questions. This gap helps explain why RAG systems can appear well-grounded while still producing incorrect, weakly cited, or overcautious answers.
 
-\bibliographystyle{plainnat}
-\bibliography{references}
+\begin{thebibliography}{9}
+
+\bibitem[Lewis et~al.(2020)]{lewis2020rag}
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin,
+Naman Goyal, Heinrich Kuttler, Mike Lewis, Wen-tau Yih, Tim Rocktaschel,
+Sebastian Riedel, and Douwe Kiela.
+\newblock Retrieval-augmented generation for knowledge-intensive NLP tasks.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2020.
+\newblock \url{https://arxiv.org/abs/2005.11401}.
+
+\bibitem[Yang et~al.(2018)]{yang2018hotpotqa}
+Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W. Cohen,
+Ruslan Salakhutdinov, and Christopher D. Manning.
+\newblock HotpotQA: A dataset for diverse, explainable multi-hop question answering.
+\newblock In \emph{Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing}, 2018.
+\newblock \url{https://arxiv.org/abs/1809.09600}.
+
+\bibitem[Thakur et~al.(2021)]{thakur2021beir}
+Nandan Thakur, Nils Reimers, Andreas R{\"u}ckl{\'e}, Abhishek Srivastava, and Iryna Gurevych.
+\newblock BEIR: A heterogeneous benchmark for zero-shot evaluation of information retrieval models.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2021.
+\newblock \url{https://arxiv.org/abs/2104.08663}.
+
+\bibitem[Liu et~al.(2023)]{liu2023verifiability}
+Nelson F. Liu, Tianyi Zhang, and Percy Liang.
+\newblock Evaluating verifiability in generative search engines.
+\newblock \emph{arXiv preprint arXiv:2304.09848}, 2023.
+\newblock \url{https://arxiv.org/abs/2304.09848}.
+
+\bibitem[Es et~al.(2024)]{es2023ragas}
+Shahul Es, Jithin James, Luis Espinosa-Anke, and Steven Schockaert.
+\newblock RAGAS: Automated evaluation of retrieval augmented generation.
+\newblock In \emph{Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations}, 2024.
+\newblock \url{https://arxiv.org/abs/2309.15217}.
+
+\bibitem[Saad-Falcon et~al.(2024)]{saadfalcon2024ares}
+Jon Saad-Falcon et~al.
+\newblock ARES: An automated evaluation framework for retrieval-augmented generation systems.
+\newblock In \emph{Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics}, 2024.
+\newblock \url{https://arxiv.org/abs/2311.09476}.
+
+\bibitem[Niu et~al.(2024)]{niu2024ragtruth}
+Cheng Niu et~al.
+\newblock RAGTruth: A hallucination corpus for developing trustworthy retrieval-augmented language models.
+\newblock \emph{arXiv preprint arXiv:2401.00396}, 2024.
+\newblock \url{https://arxiv.org/abs/2401.00396}.
+
+\end{thebibliography}
 
 \end{document}
