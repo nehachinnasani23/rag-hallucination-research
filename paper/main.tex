@@ -185,7 +185,7 @@ All answer-generation experiments used a strict citation prompt. The prompt inst
 
 The gold-evidence condition uses the expected supporting sentence IDs from the dataset. This condition is best understood as an upper-bound evidence setting, not as a realistic deployment setting. It asks: if the model receives the correct supporting facts, how often can it answer and cite correctly? The purpose of this condition is to isolate generator and citation behavior when retrieval is no longer the main bottleneck.
 
-The vector-retrieval condition is closer to a deployed RAG pipeline. Source sentences are embedded into a vector index. At query time, the question is embedded, cosine similarity is computed between the question embedding and source-sentence embeddings, and the top-k sentences are selected as context. The main generated-answer experiment uses top-8 vector retrieval. Retrieval-completeness metrics are also computed for k=1, 3, 5, and 8, allowing the study to show how evidence coverage changes as more passages are included.
+The vector-retrieval condition is closer to a deployed RAG pipeline. Source sentences are embedded using \texttt{text-embedding-3-small}. The generated vector index contains 2,190 sentence rows, and each embedding has 1,536 dimensions. The index is stored as a JSONL file rather than in an approximate nearest-neighbor library such as FAISS; this keeps the pilot implementation transparent and easy to inspect. At query time, each question is embedded using the same embedding model. Cosine similarity is then computed between the question embedding and every stored sentence embedding, and the top-k sentences are selected as context. Because cosine similarity divides by vector norms during scoring, embeddings do not need to be pre-normalized in the stored index. The main generated-answer experiment uses top-8 vector retrieval. Retrieval-completeness metrics are also computed for k=1, 3, 5, and 8, allowing the study to show how evidence coverage changes as more passages are included.
 
 The cross-model comparison reuses saved top-8 retrieved contexts. This is important because it avoids comparing models on different retrieved evidence. If each model were allowed to retrieve independently, differences in answer quality could come from retrieval differences rather than generator differences. By holding the retrieved context fixed, the comparison focuses on how models use the same evidence.
 
@@ -318,7 +318,7 @@ Retrieval completeness & Questions with expected citation IDs & Whether retrieva
 
 \subsection{Gold Evidence vs. Vector Retrieval}
 
-Table~\ref{tab:gold-vector} compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
+Table~\ref{tab:gold-vector} provides the main pilot result. It compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
 
 \begin{table*}[t]
 \centering
@@ -331,11 +331,11 @@ Gold evidence & 25 & 88.0\% & 87.5\% & 0.0\% \\
 Vector top-8 & 50 & 60.0\% & 67.5\% & 6.0\% \\
 \bottomrule
 \end{tabular}
-\caption{Gold evidence compared with vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
+\caption{Main pilot comparison between gold evidence and vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
 \label{tab:gold-vector}
 \end{table*}
 
-The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark. Figure~\ref{fig:gold-vector-bars} visualizes the same performance gap.
+The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark. This row-count mismatch is explicitly addressed in the Limitations section. Figure~\ref{fig:gold-vector-bars} visualizes the same performance gap.
 
 The partial-credit scores sharpen this interpretation. In the gold-evidence condition, strict answer accuracy was 88.0\%, while partial-credit answer score was 90.0\%. This means that only a small amount of additional partial credit was available beyond the strict score. In the vector top-8 condition, strict answer accuracy was 60.0\%, while partial-credit answer score was 65.0\%. The wider gap indicates that vector retrieval produced more partially useful answers. These responses were not fully correct, but they often contained part of the expected evidence chain or the expected answer embedded in a cautious refusal.
 
@@ -537,7 +537,25 @@ The strict citation prompt sometimes caused models to refuse even when enough co
 \paragraph{Unsupported inference.}
 In a small number of cases, the model supplied a correct answer using a fact not actually supported by the retrieved context. These cases were labeled as hallucinations because the answer was not grounded in the provided evidence.
 
-The current study records qualitative notes for wrong and partial answers. These notes support the error categories above, but the paper reports the taxonomy qualitatively rather than as a separate count table.
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Error Pattern} & \textbf{Count} \\
+\midrule
+Retrieval miss & 11 \\
+Partial evidence chain & 10 \\
+Unsupported or incorrect citation & 3 \\
+Overcautious or incorrect refusal & 13 \\
+Unsupported inference / hallucination & 3 \\
+\bottomrule
+\end{tabular}
+\caption{Non-mutually exclusive error-pattern counts for the \texttt{gpt-4.1-mini} vector top-8 run over 50 questions.}
+\label{tab:error-counts}
+\end{table}
+
+Table~\ref{tab:error-counts} summarizes the dominant error patterns. The categories are non-mutually exclusive: for example, a single response can be both an overcautious refusal and a retrieval miss if the model refuses because the retrieved context lacks a necessary supporting fact. The largest category is overcautious or incorrect refusal, which is expected under a strict citation prompt when evidence is incomplete. Retrieval misses and partial evidence chains together explain many of these refusals. The three unsupported inference cases correspond to the hallucination count in the main vector top-8 run.
 
 \section{Discussion}
 
@@ -559,6 +577,24 @@ This study is a pilot and has several limitations.
     \item Human labels were assigned by a single annotator. This makes the evaluation reproducible within the released rubric and files, but does not measure inter-annotator agreement.
     \item HotpotQA is a benchmark dataset, not a real enterprise knowledge base, so enterprise generalization should be made cautiously.
 \end{itemize}
+
+\subsection{Threats to Validity}
+
+\paragraph{Internal validity.}
+The human labels were assigned by a single annotator. This may introduce subjectivity in borderline cases, especially when deciding whether a citation is partial or incorrect. The study reduces this risk by storing notes for labeled rows and by computing metrics directly from visible label columns, but it does not report inter-annotator agreement.
+
+\paragraph{External validity.}
+The evaluation uses a 50-question HotpotQA sample. HotpotQA is useful for multi-hop reasoning and sentence-level evidence, but it may not represent enterprise RAG settings with longer documents, noisy formatting, private terminology, or domain-specific retrieval constraints.
+
+\paragraph{Construct validity.}
+The operational definitions of hallucination and citation correctness depend on the rubric used in this paper. In particular, an answer can be factually true but still labeled as hallucinated if the claim is not supported by the retrieved context. This is appropriate for grounded RAG evaluation, but it differs from evaluations that judge only world truth or answer exact match.
+
+\section{Data and Code Availability}
+
+The code, prompts, generated outputs, human label columns, retrieval summaries, and paper source are available in the project repository:
+\url{https://github.com/nehachinnasani23/rag-hallucination-research}.
+
+The repository includes the HotpotQA-derived question file, sentence-level source documents, answer CSVs, retrieval-debug files, prompt-debug files, and scripts for recomputing the reported metrics. API keys and generated embedding indexes are not committed. The vector index can be rebuilt locally from the provided source documents.
 
 \section{Conclusion}
 
@@ -602,15 +638,15 @@ Shahul Es, Jithin James, Luis Espinosa-Anke, and Steven Schockaert.
 \newblock \url{https://arxiv.org/abs/2309.15217}.
 
 \bibitem[Saad-Falcon et~al.(2024)]{saadfalcon2024ares}
-Jon Saad-Falcon et~al.
+Jon Saad-Falcon, Omar Khattab, Christopher Potts, and Matei Zaharia.
 \newblock ARES: An automated evaluation framework for retrieval-augmented generation systems.
 \newblock In \emph{Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics}, 2024.
 \newblock \url{https://arxiv.org/abs/2311.09476}.
 
 \bibitem[Niu et~al.(2024)]{niu2024ragtruth}
-Cheng Niu et~al.
+Cheng Niu, Yuanhao Wu, Juno Zhu, Siliang Xu, Kashun Shum, Randy Zhong, Juntong Song, and Tong Zhang.
 \newblock RAGTruth: A hallucination corpus for developing trustworthy retrieval-augmented language models.
-\newblock \emph{arXiv preprint arXiv:2401.00396}, 2024.
+\newblock In \emph{Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics}, 2024.
 \newblock \url{https://arxiv.org/abs/2401.00396}.
 
 \end{thebibliography}
