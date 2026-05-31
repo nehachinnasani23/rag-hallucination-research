@@ -100,7 +100,7 @@ python3 src/retrieval_quality.py \
   --answers data/hotpotqa_vector_answers_raw.csv \
   --ks 1 3 5 8
 
-run_labeled_eval "gold_25" "data/main_openai_answers_raw.csv"
+run_labeled_eval "gold_50" "data/hotpotqa_gold_gpt41mini_50_answers_raw.csv"
 run_labeled_eval "vector_top8_gpt41mini_50" "data/hotpotqa_vector_answers_raw.csv"
 
 run_generation_if_possible \
@@ -181,7 +181,7 @@ echo
 echo "All available test cases completed."
 echo "Key outputs:"
 echo "- outputs/retrieval_quality_summary.csv"
-echo "- outputs/results_summary_gold_25.csv"
+echo "- outputs/results_summary_gold_50.csv"
 echo "- outputs/results_summary_vector_top8_gpt41mini_50.csv"
 echo "- outputs/model_comparison.csv"
 echo "- outputs/topk_answer_comparison.csv"

@@ -31,7 +31,7 @@ Full available labeled runs:
 
 | Experiment | Rows Scored | Answer Accuracy | Citation Accuracy | Hallucination Rate |
 |---|---:|---:|---:|---:|
-| Gold evidence, `gpt-4.1-mini` | 25 | 88.0% | 87.5% | 0.0% |
+| Gold evidence, `gpt-4.1-mini` | 50 | 88.0% | 73.9% | 2.0% |
 | Vector top-8, `gpt-4.1-mini` | 50 | 60.0% | 67.5% | 6.0% |
 | Vector top-8, `gpt-4.1` | 50 | 54.0% | 60.0% | 2.0% |
 | Vector top-8, Claude | 50 | 56.0% | 60.0% | 2.0% |
@@ -106,6 +106,21 @@ python3 src/build_vector_index.py \
 ```
 
 ## Generate Answers
+
+Gold-evidence baseline:
+
+```bash
+python3 src/main.py \
+  --questions data/hotpotqa/questions.csv \
+  --source-dir data/hotpotqa/source_documents \
+  --retrieval gold \
+  --top-k 8 \
+  --limit 50 \
+  --settings strict_citation_rag \
+  --provider openai \
+  --model gpt-4.1-mini \
+  --output data/hotpotqa_gold_gpt41mini_50_answers_raw.csv
+```
 
 Baseline vector retrieval with strict citation:
 
@@ -193,6 +208,7 @@ bash scripts/run_all_with_keys.sh
 - `outputs/model_comparison_first20.csv`
 - `outputs/proper_metrics_all_available.csv`
 - `outputs/retrieval_quality_vector_top8_summary.csv`
+- `outputs/results_summary_gold_50.csv`
 - `outputs/results_summary_vector_top8_gpt41mini_50.csv`
 - `outputs/results_summary_vector_top8_gpt41_50.csv`
 - `outputs/results_summary_vector_top8_claude_50.csv`

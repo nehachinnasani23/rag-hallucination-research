@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-Retrieval-augmented generation (RAG) is commonly used to ground large language model outputs in external documents, but retrieval alone does not guarantee correctness, faithfulness, or citation quality. This paper presents a pilot evaluation framework for measuring answer accuracy, citation accuracy, retrieval completeness, and hallucination in RAG-based question answering. We construct a sentence-level evaluation set from HotpotQA, using its gold answers and supporting facts as reference evidence. We compare a best-case gold-evidence condition against a realistic vector-retrieval condition and evaluate multiple models under the same strict citation prompt. In the gold-evidence condition, \texttt{gpt-4.1-mini} achieved 88.0\% answer accuracy, 87.5\% citation accuracy, and 0.0\% hallucination over 25 labeled questions. Under vector top-8 retrieval, the same model dropped to 60.0\% answer accuracy, 67.5\% citation accuracy, and 6.0\% hallucination over 50 labeled questions. Retrieval analysis showed that vector top-8 retrieved at least one gold supporting sentence for 100.0\% of questions but retrieved all gold supporting sentences for only 52.0\%. These results suggest that partial evidence retrieval is a major failure mode for multi-hop RAG: a model may receive relevant evidence while still lacking the complete evidence chain needed for a correct, fully supported answer.
+Retrieval-augmented generation (RAG) is commonly used to ground large language model outputs in external documents, but retrieval alone does not guarantee correctness, faithfulness, or citation quality. This paper presents a pilot evaluation framework for measuring answer accuracy, citation accuracy, retrieval completeness, and hallucination in RAG-based question answering. We construct a sentence-level evaluation set from HotpotQA, using its gold answers and supporting facts as reference evidence. We compare a best-case gold-evidence condition against a realistic vector-retrieval condition and evaluate multiple models under the same strict citation prompt. In the gold-evidence condition, \texttt{gpt-4.1-mini} achieved 88.0\% answer accuracy, 73.9\% citation accuracy, and 2.0\% hallucination over 50 labeled questions. Under vector top-8 retrieval, the same model dropped to 60.0\% answer accuracy, 67.5\% citation accuracy, and 6.0\% hallucination over 50 labeled questions. Retrieval analysis showed that vector top-8 retrieved at least one gold supporting sentence for 100.0\% of questions but retrieved all gold supporting sentences for only 52.0\%. These results suggest that partial evidence retrieval is a major failure mode for multi-hop RAG: a model may receive relevant evidence while still lacking the complete evidence chain needed for a correct, fully supported answer.
 \end{abstract}
 
 \noindent\textbf{Keywords:} retrieval-augmented generation, hallucination, citation accuracy, RAG evaluation, question answering, HotpotQA
@@ -318,7 +318,7 @@ Retrieval completeness & Questions with expected citation IDs & Whether retrieva
 
 \subsection{Gold Evidence vs. Vector Retrieval}
 
-Table~\ref{tab:gold-vector} provides the main pilot result. It compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
+Table~\ref{tab:gold-vector} provides the main paired result. It compares the best-case gold-evidence condition with vector top-8 retrieval for \texttt{gpt-4.1-mini}.
 
 \begin{table*}[t]
 \centering
@@ -327,17 +327,17 @@ Table~\ref{tab:gold-vector} provides the main pilot result. It compares the best
 \toprule
 \textbf{Setting} & \textbf{Rows} & \textbf{Answer Acc.} & \textbf{Citation Acc.} & \textbf{Hallucination} \\
 \midrule
-Gold evidence & 25 & 88.0\% & 87.5\% & 0.0\% \\
+Gold evidence & 50 & 88.0\% & 73.9\% & 2.0\% \\
 Vector top-8 & 50 & 60.0\% & 67.5\% & 6.0\% \\
 \bottomrule
 \end{tabular}
-\caption{Main pilot comparison between gold evidence and vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
+\caption{Main paired comparison between gold evidence and vector-retrieved evidence for \texttt{gpt-4.1-mini}.}
 \label{tab:gold-vector}
 \end{table*}
 
-The gold-evidence condition produced substantially higher answer and citation accuracy. This suggests that the model can answer and cite more reliably when the required supporting facts are present. In contrast, vector retrieval reduced answer accuracy by 28 percentage points relative to the gold condition. Because the gold-evidence condition contains 25 labeled examples while the vector-retrieval condition contains 50 labeled examples, this result should be interpreted as a pilot comparison rather than a fully balanced benchmark. This row-count mismatch is explicitly addressed in the Limitations section. Figure~\ref{fig:gold-vector-bars} visualizes the same performance gap.
+The gold-evidence condition produced substantially higher answer and moderately higher citation accuracy. This suggests that the model can answer more reliably when the required supporting facts are present, but citation behavior still requires explicit evaluation even under gold evidence. In contrast, vector retrieval reduced answer accuracy by 28 percentage points and citation accuracy by 6.4 percentage points relative to the gold condition. Because both conditions now contain 50 labeled examples, this is a paired comparison over the same question set. Figure~\ref{fig:gold-vector-bars} visualizes the same performance gap.
 
-The partial-credit scores sharpen this interpretation. In the gold-evidence condition, strict answer accuracy was 88.0\%, while partial-credit answer score was 90.0\%. This means that only a small amount of additional partial credit was available beyond the strict score. In the vector top-8 condition, strict answer accuracy was 60.0\%, while partial-credit answer score was 65.0\%. The wider gap indicates that vector retrieval produced more partially useful answers. These responses were not fully correct, but they often contained part of the expected evidence chain or the expected answer embedded in a cautious refusal.
+The partial-credit scores sharpen this interpretation. In the gold-evidence condition, strict answer accuracy was 88.0\%, while partial-credit answer score was 89.0\%. This means that only a small amount of additional partial credit was available beyond the strict score. In the vector top-8 condition, strict answer accuracy was 60.0\%, while partial-credit answer score was 65.0\%. The wider gap indicates that vector retrieval produced more partially useful answers. These responses were not fully correct, but they often contained part of the expected evidence chain or the expected answer embedded in a cautious refusal.
 
 \begin{table*}[t]
 \centering
@@ -346,7 +346,7 @@ The partial-credit scores sharpen this interpretation. In the gold-evidence cond
 \toprule
 \textbf{Setting} & \textbf{Rows} & \textbf{Ans. Acc.} & \textbf{Ans. Score} & \textbf{Cit. Acc.} & \textbf{Cit. Score} & \textbf{Halluc.} \\
 \midrule
-Gold evidence, \texttt{gpt-4.1-mini} & 25 & 88.0\% & 90.0\% & 87.5\% & 91.7\% & 0.0\% \\
+Gold evidence, \texttt{gpt-4.1-mini} & 50 & 88.0\% & 89.0\% & 73.9\% & 85.9\% & 2.0\% \\
 Vector top-8, \texttt{gpt-4.1-mini} & 50 & 60.0\% & 65.0\% & 67.5\% & 80.0\% & 6.0\% \\
 \bottomrule
 \end{tabular}
@@ -354,7 +354,7 @@ Vector top-8, \texttt{gpt-4.1-mini} & 50 & 60.0\% & 65.0\% & 67.5\% & 80.0\% & 6
 \label{tab:gold-vector-full}
 \end{table*}
 
-Citation scores show a similar pattern. The gold-evidence condition had 87.5\% strict citation accuracy and 91.7\% partial-credit citation score. The vector top-8 condition had 67.5\% strict citation accuracy but 80.0\% partial-credit citation score. This means many vector-condition citations were not entirely wrong; they often supported a question entity or an intermediate step, but not the complete final answer. This is a key finding for RAG evaluation: a citation can be related to the question while still failing as evidence for the answer.
+Citation scores show a similar but smaller gap. The gold-evidence condition had 73.9\% strict citation accuracy and 85.9\% partial-credit citation score. The vector top-8 condition had 67.5\% strict citation accuracy but 80.0\% partial-credit citation score. This means many citations were not entirely wrong; they often supported a question entity or an intermediate step, but not the complete final answer. This is a key finding for RAG evaluation: a citation can be related to the question while still failing as evidence for the answer.
 
 \begin{figure*}[t]
 \centering
@@ -374,18 +374,22 @@ Citation scores show a similar pattern. The gold-evidence condition had 87.5\% s
     \node[right] at (60,2) {\small 60.0\%};
 
     \node[left, align=right] at (0,1) {\small Gold citation};
-    \fill[green!60!black] (0,0.75) rectangle (87.5,1.25);
-    \node[right] at (87.5,1) {\small 87.5\%};
+    \fill[green!60!black] (0,0.75) rectangle (73.9,1.25);
+    \node[right] at (73.9,1) {\small 73.9\%};
 
     \node[left, align=right] at (0,0) {\small Vector citation};
     \fill[green!40] (0,-0.25) rectangle (67.5,0.25);
     \node[right] at (67.5,0) {\small 67.5\%};
 
-    \node[left, align=right] at (0,-1.9) {\small Vector hallucination};
-    \fill[red!55] (0,-2.15) rectangle (6,-1.65);
-    \node[right] at (6,-1.9) {\small 6.0\%};
+    \node[left, align=right] at (0,-1.5) {\small Gold hallucination};
+    \fill[red!35] (0,-1.75) rectangle (2,-1.25);
+    \node[right] at (2,-1.5) {\small 2.0\%};
+
+    \node[left, align=right] at (0,-2.5) {\small Vector hallucination};
+    \fill[red!55] (0,-2.75) rectangle (6,-2.25);
+    \node[right] at (6,-2.5) {\small 6.0\%};
 \end{tikzpicture}
-\caption{Gold evidence produces higher answer and citation accuracy than vector-retrieved evidence in the pilot comparison.}
+\caption{Gold evidence produces higher answer and citation accuracy than vector-retrieved evidence on the same 50-question set.}
 \label{fig:gold-vector-bars}
 \end{figure*}
 
@@ -561,7 +565,7 @@ Table~\ref{tab:error-counts} summarizes the dominant error patterns. The categor
 
 The main result is that retrieval completeness is more important than simple relevance. Vector top-8 retrieval achieved 100.0\% any-gold recall, but all-gold recall was only 52.0\%. In a multi-hop setting, retrieving one relevant sentence may still leave the model without enough evidence to answer.
 
-This finding has two implications. First, RAG evaluation should include retrieval-side metrics in addition to answer-side metrics. Second, citation evaluation should check whether citations actually support the answer, not merely whether a citation is present. The observed drop from 87.5\% citation accuracy in the gold-evidence condition to 67.5\% in the vector condition shows that citation quality depends strongly on evidence quality.
+This finding has two implications. First, RAG evaluation should include retrieval-side metrics in addition to answer-side metrics. Second, citation evaluation should check whether citations actually support the answer, not merely whether a citation is present. The observed drop from 73.9\% citation accuracy in the gold-evidence condition to 67.5\% in the vector condition shows that citation quality depends on evidence quality, but also that citation failures remain possible even when the correct evidence is provided.
 
 Strict citation prompting appears useful for reducing unsupported answers, but it cannot compensate for missing evidence. When evidence is incomplete, the prompt may push the model toward refusal. This is safer than hallucination, but it still produces an incorrect answer for answerable benchmark questions.
 
@@ -570,7 +574,6 @@ Strict citation prompting appears useful for reducing unsupported answers, but i
 This study is a pilot and has several limitations.
 
 \begin{itemize}[leftmargin=*]
-    \item The gold-evidence baseline covers 25 rows, while the main vector baseline covers 50 rows. The comparison is therefore best interpreted as a pilot contrast between best-case evidence and retrieved evidence.
     \item Gemini has 23 generated rows in the full comparison because generation stopped before all 50 rows were completed. For this reason, the first-20 table is also reported as a balanced cross-model subset.
     \item Model answer generation was scored for vector top-8 retrieval. Retrieval completeness was computed for k=1, 3, 5, and 8, but answer-generation metrics for other top-k values are outside the scope of the reported experiment.
     \item The reported HotpotQA sample consists of answerable questions. As a result, refusal accuracy, false answer rate on unanswerable questions, and unsupported citation rate on unanswerable questions are not reported.
