@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-Retrieval-augmented generation (RAG) is commonly used to ground large language model outputs in external documents, but retrieval alone does not guarantee correctness, faithfulness, or citation quality. This paper presents a pilot evaluation framework for measuring answer accuracy, citation accuracy, retrieval completeness, and hallucination in RAG-based question answering. We construct a sentence-level evaluation set from HotpotQA, using its gold answers and supporting facts as reference evidence. We compare a best-case gold-evidence condition against a realistic vector-retrieval condition and evaluate multiple models under the same strict citation prompt. In the gold-evidence condition, \texttt{gpt-4.1-mini} achieved 88.0\% answer accuracy, 73.9\% citation accuracy, and 2.0\% hallucination over 50 labeled questions. Under vector top-8 retrieval, the same model dropped to 60.0\% answer accuracy, 67.5\% citation accuracy, and 6.0\% hallucination over 50 labeled questions. Retrieval analysis showed that vector top-8 retrieved at least one gold supporting sentence for 100.0\% of questions but retrieved all gold supporting sentences for only 52.0\%. These results suggest that partial evidence retrieval is a major failure mode for multi-hop RAG: a model may receive relevant evidence while still lacking the complete evidence chain needed for a correct, fully supported answer.
+Retrieval-augmented generation (RAG) is commonly used to ground large language model outputs in external documents, but retrieval alone does not guarantee correctness, faithfulness, or citation quality. This paper presents a small-scale evaluation framework for measuring answer accuracy, citation accuracy, retrieval completeness, and hallucination in RAG-based question answering. We construct a sentence-level evaluation set from HotpotQA, using its gold answers and supporting facts as reference evidence. We compare a best-case gold-evidence condition against a realistic vector-retrieval condition and evaluate multiple models under the same strict citation prompt. In the gold-evidence condition, \texttt{gpt-4.1-mini} achieved 88.0\% answer accuracy, 73.9\% citation accuracy, and 2.0\% hallucination over 50 labeled questions. Under vector top-8 retrieval, the same model dropped to 60.0\% answer accuracy, 67.5\% citation accuracy, and 6.0\% hallucination over 50 labeled questions. Retrieval analysis showed that vector top-8 retrieved at least one gold supporting sentence for 100.0\% of questions but retrieved all gold supporting sentences for only 52.0\%. These results suggest that partial evidence retrieval is a major failure mode for multi-hop RAG: a model may receive relevant evidence while still lacking the complete evidence chain needed for a correct, fully supported answer.
 \end{abstract}
 
 \noindent\textbf{Keywords:} retrieval-augmented generation, hallucination, citation accuracy, RAG evaluation, question answering, HotpotQA
@@ -47,7 +47,7 @@ This study asks:
 How do answer accuracy, citation accuracy, and hallucination rate change when a RAG system uses gold supporting evidence versus automatically retrieved evidence?
 \end{quote}
 
-We present a small but reproducible pilot study using HotpotQA \citep{yang2018hotpotqa}. The study focuses on separating three sources of error: retrieval failure, reasoning failure, and citation failure. Our main finding is that vector retrieval can appear successful under a weak retrieval metric, such as retrieving any gold evidence, while still failing to retrieve the complete evidence chain needed for a correct answer.
+We present a small but reproducible study using HotpotQA \citep{yang2018hotpotqa}. The study focuses on separating three sources of error: retrieval failure, reasoning failure, and citation failure. Our main finding is that vector retrieval can appear successful under a weak retrieval metric, such as retrieving any gold evidence, while still failing to retrieve the complete evidence chain needed for a correct answer.
 
 The paper makes four contributions. First, it gives a compact evaluation protocol for RAG question answering that reports answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. Second, it distinguishes any-evidence retrieval from all-evidence retrieval, a distinction that is especially important for multi-hop questions. Third, it compares a gold-evidence condition with a vector-retrieval condition so that retrieval errors can be separated from generator errors. Fourth, it reports a small cross-model comparison in which the retrieved context is held fixed and only the generator model changes.
 
@@ -96,7 +96,7 @@ The evaluation uses a 50-question sample derived from HotpotQA. Each example con
 
 The source documents are converted into sentence-level records with IDs such as \texttt{S000001}. The model is instructed to answer using only the provided context and cite supporting sentence IDs. The task is therefore not only to answer correctly, but also to cite evidence that supports the answer.
 
-HotpotQA is especially appropriate for this pilot because many questions require multi-hop reasoning. A model may need one sentence to identify an entity and another sentence to answer the final question. This allows the experiment to test whether retrieval returns the full evidence chain, not merely a related passage.
+HotpotQA is especially appropriate for this study because many questions require multi-hop reasoning. A model may need one sentence to identify an entity and another sentence to answer the final question. This allows the experiment to test whether retrieval returns the full evidence chain, not merely a related passage.
 
 \subsection{Sentence-Level Evidence Format}
 
@@ -156,7 +156,7 @@ Figure~\ref{fig:pipeline} summarizes the evaluation pipeline. The dataset provid
 \node[align=center, below=0.55cm of retrieve, text width=3.1cm] {\small sentence IDs\\such as \texttt{S000001}};
 \node[align=center, below=0.55cm of metrics, text width=3.2cm] {\small answer accuracy\\citation accuracy\\hallucination};
 \end{tikzpicture}
-\caption{RAG evaluation workflow used in the pilot study.}
+\caption{RAG evaluation workflow used in the study.}
 \label{fig:pipeline}
 \end{figure*}
 
@@ -185,7 +185,7 @@ All answer-generation experiments used a strict citation prompt. The prompt inst
 
 The gold-evidence condition uses the expected supporting sentence IDs from the dataset. This condition is best understood as an upper-bound evidence setting, not as a realistic deployment setting. It asks: if the model receives the correct supporting facts, how often can it answer and cite correctly? The purpose of this condition is to isolate generator and citation behavior when retrieval is no longer the main bottleneck.
 
-The vector-retrieval condition is closer to a deployed RAG pipeline. Source sentences are embedded using \texttt{text-embedding-3-small}. The generated vector index contains 2,190 sentence rows, and each embedding has 1,536 dimensions. The index is stored as a JSONL file rather than in an approximate nearest-neighbor library such as FAISS; this keeps the pilot implementation transparent and easy to inspect. At query time, each question is embedded using the same embedding model. Cosine similarity is then computed between the question embedding and every stored sentence embedding, and the top-k sentences are selected as context. Because cosine similarity divides by vector norms during scoring, embeddings do not need to be pre-normalized in the stored index. The main generated-answer experiment uses top-8 vector retrieval. Retrieval-completeness metrics are also computed for k=1, 3, 5, and 8, allowing the study to show how evidence coverage changes as more passages are included.
+The vector-retrieval condition is closer to a deployed RAG pipeline. Source sentences are embedded using \texttt{text-embedding-3-small}. The generated vector index contains 2,190 sentence rows, and each embedding has 1,536 dimensions. The index is stored as a JSONL file rather than in an approximate nearest-neighbor library such as FAISS; this keeps the implementation transparent and easy to inspect. At query time, each question is embedded using the same embedding model. Cosine similarity is then computed between the question embedding and every stored sentence embedding, and the top-k sentences are selected as context. Because cosine similarity divides by vector norms during scoring, embeddings do not need to be pre-normalized in the stored index. The main generated-answer experiment uses top-8 vector retrieval. Retrieval-completeness metrics are also computed for k=1, 3, 5, and 8, allowing the study to show how evidence coverage changes as more passages are included.
 
 The cross-model comparison reuses saved top-8 retrieved contexts. This is important because it avoids comparing models on different retrieved evidence. If each model were allowed to retrieve independently, differences in answer quality could come from retrieval differences rather than generator differences. By holding the retrieved context fixed, the comparison focuses on how models use the same evidence.
 
@@ -546,7 +546,7 @@ In a small number of cases, the model supplied a correct answer using a fact not
 \small
 \begin{tabular}{lr}
 \toprule
-\textbf{Error Pattern} & \textbf{Count} \\
+\textbf{Error Type} & \textbf{Count} \\
 \midrule
 Retrieval miss & 11 \\
 Partial evidence chain & 10 \\
@@ -571,7 +571,7 @@ Strict citation prompting appears useful for reducing unsupported answers, but i
 
 \section{Limitations}
 
-This study is a pilot and has several limitations.
+This study is small-scale and has several limitations.
 
 \begin{itemize}[leftmargin=*]
     \item Gemini has 23 generated rows in the full comparison because generation stopped before all 50 rows were completed. For this reason, the first-20 table is also reported as a balanced cross-model subset.
@@ -601,7 +601,7 @@ The repository includes the HotpotQA-derived question file, sentence-level sourc
 
 \section{Conclusion}
 
-This paper presented a pilot evaluation of hallucination and citation accuracy in RAG-based question answering. The results show that gold evidence produces substantially better answer and citation accuracy than vector-retrieved evidence in the evaluated sample. The retrieval analysis explains why: vector retrieval often found relevant evidence but failed to retrieve the full evidence chain required for multi-hop questions.
+This paper presented an evaluation of hallucination and citation accuracy in RAG-based question answering. The results show that gold evidence produces substantially better answer and citation accuracy than vector-retrieved evidence in the evaluated sample. The retrieval analysis explains why: vector retrieval often found relevant evidence but failed to retrieve the full evidence chain required for multi-hop questions.
 
 The central conclusion is that RAG quality depends on complete evidence, not merely relevant evidence. A robust RAG evaluation should therefore measure answer accuracy, citation accuracy, hallucination rate, and retrieval completeness together. In this experiment, vector retrieval retrieved at least one gold supporting sentence for every question at top-8, but retrieved all gold supporting sentences for only 52.0\% of questions. This gap helps explain why RAG systems can appear well-grounded while still producing incorrect, weakly cited, or overcautious answers.
 
@@ -612,20 +612,20 @@ Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin
 Naman Goyal, Heinrich Kuttler, Mike Lewis, Wen-tau Yih, Tim Rocktaschel,
 Sebastian Riedel, and Douwe Kiela.
 \newblock Retrieval-augmented generation for knowledge-intensive NLP tasks.
-\newblock In \emph{Advances in Neural Information Processing Systems}, 2020.
+\newblock In \emph{Advances in Neural Information Processing Systems 33}, 2020.
 \newblock \url{https://arxiv.org/abs/2005.11401}.
 
 \bibitem[Yang et~al.(2018)]{yang2018hotpotqa}
 Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W. Cohen,
 Ruslan Salakhutdinov, and Christopher D. Manning.
 \newblock HotpotQA: A dataset for diverse, explainable multi-hop question answering.
-\newblock In \emph{Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing}, 2018.
+\newblock In \emph{Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing}, pages 2369--2380, 2018.
 \newblock \url{https://arxiv.org/abs/1809.09600}.
 
 \bibitem[Thakur et~al.(2021)]{thakur2021beir}
 Nandan Thakur, Nils Reimers, Andreas R{\"u}ckl{\'e}, Abhishek Srivastava, and Iryna Gurevych.
 \newblock BEIR: A heterogeneous benchmark for zero-shot evaluation of information retrieval models.
-\newblock In \emph{Advances in Neural Information Processing Systems}, 2021.
+\newblock In \emph{Advances in Neural Information Processing Systems 34}, 2021.
 \newblock \url{https://arxiv.org/abs/2104.08663}.
 
 \bibitem[Liu et~al.(2023)]{liu2023verifiability}
@@ -643,7 +643,7 @@ Shahul Es, Jithin James, Luis Espinosa-Anke, and Steven Schockaert.
 \bibitem[Saad-Falcon et~al.(2024)]{saadfalcon2024ares}
 Jon Saad-Falcon, Omar Khattab, Christopher Potts, and Matei Zaharia.
 \newblock ARES: An automated evaluation framework for retrieval-augmented generation systems.
-\newblock In \emph{Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics}, 2024.
+\newblock \emph{arXiv preprint arXiv:2311.09476}, 2023.
 \newblock \url{https://arxiv.org/abs/2311.09476}.
 
 \bibitem[Niu et~al.(2024)]{niu2024ragtruth}
